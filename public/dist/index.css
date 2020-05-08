@@ -1,0 +1,206 @@
+body {
+  overflow: hidden;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+}
+main {
+  max-width: 1250px;
+  max-height: 750px;
+  min-height: 400px;
+  min-width: 950px;
+}
+.hide {
+  display: none!important;
+}
+#invite-wrap input {
+  text-align: center;
+}
+#wrap {
+  height: 100%;
+}
+#invite-wrap {
+  display: flex;
+  align-items: center;
+  height: 100%;
+}
+#rooms-wrap {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  height: 100%;
+}
+#chatters-menu {
+  max-width: 200px;
+  min-width: 150px;
+  margin-right: 20px;
+}
+#chatters-list {
+  margin-bottom: 50px;
+}
+#chatters-list > li {
+  user-select: none;
+  position: relative;
+}
+
+#chatters-list > li:hover .delete-chatter {
+  display: block;
+}
+
+#chatters-list > li .delete-chatter {
+
+  display: none;
+  position: absolute;
+  width: 40px;
+  height: 100%;
+  right: 0;
+  bottom: 0;
+  background-color: red;
+}
+
+.delete-chatter > i {
+  color: black;
+}
+#add-chatter {
+  width: 100%;
+}
+#add-chatter > i {
+  width: 100%;
+}
+
+#chat-wrap {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  width: 100%;
+  border-left: 1px solid #204051;
+}
+#chat {
+  height: 400px;
+  flex-grow: 1;
+  padding: 1em;
+  overflow-y: scroll;
+  margin-bottom: 1em;
+  font-family: Helvetica, monospace;
+}
+.message-in {
+  display: flex;
+  flex-direction: column;
+  flex-wrap: nowrap;
+  font-size: 16px;
+}
+.message-out {
+  display: flex;
+  justify-content: flex-end;
+  flex-wrap: wrap;
+  font-size: 16px;
+}
+.uuid-in {
+  font-size: 0.8em;
+  text-align: left;
+  width: 100%;
+  user-select: none;
+}
+
+.uuid-out {
+  font-size: 0.8em;
+  text-align: right;
+  width: 100%;
+  user-select: none;
+}
+
+.message-text {
+  max-width: 80%;
+  flex-grow: 1;
+}
+.message-out .message-text {
+  background-color: whitesmoke;
+}
+.message-in .message-text {
+  background-color: burlywood
+}
+.message {
+  background-color: transparent;
+}
+.message-out .message-body.message-text {
+  border-width: 0 4px 0 0;
+  padding: .5em 1em;
+}
+.message-body {
+  padding: .5em 1em;
+}
+.progress {
+  height: 2px;
+  border-radius: 0px;
+}
+#message-form {
+
+}
+#message-form textarea.textarea {
+  font-family: Helvetica, monospace;
+  word-wrap: break-word;
+  line-height: 1em;
+  font-size: 16px;
+  border-radius: 0;
+  resize: none;
+  height: calc(3em + 2px);
+  padding: 1em;
+  min-height: unset;
+  max-height: 6em;
+}
+#send-button {
+  margin-left: 3px;
+  border-radius: 0;
+  min-height: calc(3em + 2px);
+  min-width: 70px;
+}
+#send-icon {
+  height: 100%;
+}
+
+.mod {
+  position: absolute!important;
+  top: 50%;
+  left: 50%;
+  z-index: 9999;
+  user-select: none;
+}
+
+.invi-resp-popup {
+
+  position: absolute;
+  right: 50px;
+  bottom: 50px;
+  z-index: 9999;
+  user-select: none;
+
+}
+
+div > #rooms-nav {
+  
+ flex-grow: 1; 
+
+}
+
+#room-wrap {
+  flex-wrap: row;
+  display: flex;
+}
+
+#rooms-nav i.fas.fa-times {
+  display: none;
+  padding-left: 10px;
+}
+
+#rooms-nav li.is-active i.fas.fa-times {
+  
+  display: inline-block;
+}
+
+#rooms-wrap > div {
+  
+  display: flex;
+  justify-content: space-between;
+
+}

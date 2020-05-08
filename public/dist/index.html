@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset='utf-8'>
+    <meta http-equiv='X-UA-Compatible' content='IE=edge'>
+    <title>crypto-chat</title>
+    <meta name='viewport' content='width=device-width, initial-scale=1'>
+    <link rel='stylesheet' type='text/css' media='screen' href='bulma/css/bulma.min.css'>
+    <link rel='stylesheet' type='text/css' media='screen' href='fontawesome-free/css/all.min.css'>
+    <link rel='stylesheet' type='text/css' media='screen' href='index.css'>
+  </head>
+  <body>
+    <main>
+      <div id="wrap" class="container is-fluid box">
+        <div id="invite-wrap">
+          <form class="tile is-vertical" action="javascript:void(0);">
+            <label for="session_id" class="label"> Session ID </label>
+            <div class="field has-addons">
+              <div class="control is-expanded">
+                <input id="session_id" readonly type="text" class="input">
+              </div>
+              <div class="control">
+                <button type="button" class="button is-light">copiar</button>
+              </div>
+            </div>  
+            <button id="create_room" type="button" class="button is-primary"> Create room </button>
+            <label for="join_room_id" class="label"> Join room ID</label>
+            <div class="field has-addons">
+              <div class="control is-expanded">
+                <input id="join_room_id" type="text" class="input" autocomplete="off">
+              </div>
+            </div>
+            <button id="join_room" type="button" class="button is-primary"> Join </button>
+          </form>
+        </div>
+        <div id="rooms-wrap" class="hide">
+          <div> 
+            <div id="rooms-nav" class="tabs is-boxed">
+              <ul>
+              </ul>
+            </div>
+            <button id="add-room" class="button" type="button"><i class="fas fa-plus"></i></button>
+          </div>
+          <div id="room-wrap">
+            <div id="chatters-menu" class="menu">
+              <p class="menu-label">Chatters</p>
+              <ul id="chatters-list" class="menu-list">
+              </ul>
+              <button id="add-chatter" class="button is-primary"><i class="fas fa-plus-square"></i></button>
+            </div>
+            <div id="chat-wrap">
+              <div id="chat">
+              </div>
+              <form id="message-form" action="javascript:void(0);">
+                <div class="field has-addons">
+                  <div class="control is-expanded">
+                    <textarea id="out-text" class="textarea" rows="0" tabindex="1"></textarea>
+                  </div>
+                  <div class="control">
+                    <button id="send-button" type="button" class="button" tabindex="2"> <i id="send-icon" class="fas fa-paper-plane"></i></button>
+                  </div>
+                </div>
+              </form>
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
+    <progress style="display: none;" class="progress is-primary" max="100"></progress>
+    <script src='index.js'></script>
+  </body>
+</html>
