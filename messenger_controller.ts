@@ -126,10 +126,9 @@ class Room {
     this.join_invites.delete(chatter.uuid);
 
     if (wants_to_join) this.add_chatter(chatter);
-    
+
     const response = {room_uuid: this.uuid, chatter_uuid: chatter.uuid, join: wants_to_join} as Room_invitation_response;
     this.room_creator.connection.emit('invite_responded', response);
-    
   }
   public destroy (): void {
     this.chatters.forEach((chatter: Chatter)=> {
@@ -159,6 +158,7 @@ class Room {
     chatter.connection.emit('left_room', this.uuid);
   }
   public send_message(data: Message_distributable, from_uuid: string): void {
+    if (!this.chatters.has(from_uuid)) return void 0;
 
     for (let i = 0; i < data.message.length; i++) {
 
@@ -175,14 +175,19 @@ class Room {
     }
   }
   public request_join (chatter_uuid: string): void {
-    this.room_creator.connection.emit(
-      'chatter_join_request', 
+    
+    if (this.join_requests.has(chatter_uuid)) return void 0;
+    
+    this.room_creator.connection.emit( 'chatter_join_request', 
       {chatter_uuid: chatter_uuid, room_uuid: this.uuid}  as Room_join_req);
+    this.join_requests.add(chatter_uuid);
   }
   public handle_join_room_req_response (chatter: Chatter, can_join: boolean): void {
-  
+    
+    if (!this.join_requests.has(chatter.uuid)) return void 0;
+    
     if (can_join) this.add_chatter(chatter);
-  
+    this.join_requests.delete(chatter.uuid);
   }
   public leave_or_destroy (chatter_uuid: string): boolean {
     
