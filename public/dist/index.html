@@ -14,7 +14,7 @@
       <div id="wrap" class="container is-fluid box">
         <div id="invite-wrap">
           <form class="tile is-vertical" action="javascript:void(0);">
-            <label for="session_id" class="label"> Session ID </label>
+            <label for="session_id" class="label"> Session UUID </label>
             <div class="field has-addons">
               <div class="control is-expanded">
                 <input id="session_id" readonly type="text" class="input">
@@ -24,10 +24,10 @@
               </div>
             </div>  
             <button id="create_room" type="button" class="button is-primary"> Create room </button>
-            <label for="join_room_id" class="label"> Join room ID</label>
+            <label for="join_room_id" class="label"> Join room </label>
             <div class="field has-addons">
               <div class="control is-expanded">
-                <input id="join_room_id" type="text" class="input" autocomplete="off">
+                <input id="join_room_id" type="text" placeholder="UUID" class="input" autocomplete="off">
               </div>
             </div>
             <button id="join_room" type="button" class="button is-primary"> Join </button>

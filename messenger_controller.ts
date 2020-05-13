@@ -79,7 +79,7 @@ export class Messenger_controller {
     const room = this.rooms.get(resp.room_uuid);
     const chatter_requesting = this.chatters_registered.get(resp.chatter_uuid);
     if (room === undefined || chatter_requesting === undefined) return void 0;
-    room.handle_join_room_req_response(chatter_requesting, resp.can_join);
+    room.handle_join_room_req_response(chatter_requesting, resp);
   }
   public leave_room (chatter_uuid: string, room_uuid: string): void {
 
@@ -182,11 +182,12 @@ class Room {
       {chatter_uuid: chatter_uuid, room_uuid: this.uuid}  as Room_join_req);
     this.join_requests.add(chatter_uuid);
   }
-  public handle_join_room_req_response (chatter: Chatter, can_join: boolean): void {
+  public handle_join_room_req_response (chatter: Chatter, resp: Room_join_req_response): void {
     
     if (!this.join_requests.has(chatter.uuid)) return void 0;
     
-    if (can_join) this.add_chatter(chatter);
+    if (resp.can_join) this.add_chatter(chatter);
+    chatter.connection.emit('join_request_responded', resp);
     this.join_requests.delete(chatter.uuid);
   }
   public leave_or_destroy (chatter_uuid: string): boolean {

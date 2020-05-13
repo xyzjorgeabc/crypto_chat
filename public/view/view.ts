@@ -4,7 +4,8 @@ import {
   Room_invitation, 
   Room_invitation_response,
   Room_join_req,
-  Message
+  Message,
+  Room_join_req_response
 } from '../controller/messenger_controller';
 
 export class View_controller {
@@ -39,7 +40,15 @@ export class View_controller {
   private _set_messenger_listeners (): void {
     this.messenger.invited_to_room.add_listener(this.display_invited_to_room.bind(this));
     this.messenger.room_created.add_listener(this._on_room_created.bind(this));
-    this.messenger.invite_responded.add_listener(this.display_invite_response.bind(this));
+    this.messenger.invite_responded.add_listener((resp: Room_invitation_response) => {
+      const message = `User ${resp.join ? 'accepted' : 'declined' } the invitation to join room ${resp.room_uuid}.`;
+      display_info_card(message);
+    });
+    this.messenger.join_request_responded.add_listener((resp: Room_join_req_response) => {
+    
+      const message = `Your request to join room ${resp.room_uuid} has been ${resp.can_join ? 'accepted': 'declined'}.`;
+      display_info_card(message);
+    });
     this.messenger.rooms_update.add_listener(this.update_rooms_nav.bind(this));
     this.messenger.rooms_update.add_listener(this.update_active_room.bind(this));
     this.messenger.chatter_join_request.add_listener(this.display_room_join_request.bind(this));
@@ -231,25 +240,6 @@ export class View_controller {
     document.body.appendChild(wrap_div);
     center_absolute(wrap_div);
 
-  }
-  private display_invite_response (response: Room_invitation_response): void {
-
-    const popup_text = `
-    User ${response.chatter_uuid} ${response.join ? 'accepted': 'declined' } the invitation to join room ${response.room_uuid}.
-    `;
-
-    const main_div = document.createElement('DIV') as HTMLElement;
-    const text_node = document.createTextNode(popup_text);
-
-    main_div.classList.add('box');
-    main_div.classList.add('invi-resp-popup');
-
-    main_div.appendChild(text_node);
-
-    document.body.appendChild(main_div);
-    main_div.addEventListener('click', function(){
-      main_div.remove();
-    });
   }
   private display_room_join_request (req: Room_join_req): void {
 
@@ -504,3 +494,21 @@ function format_messages (msgs: Message[], offset: number, max_groups: number): 
   return formatted_msgs;
 }
 
+function display_info_card (text: string): void {
+
+  
+    const main_div = document.createElement('DIV') as HTMLElement;
+    const text_node = document.createTextNode(text);
+
+    main_div.classList.add('box');
+    main_div.classList.add('invi-resp-popup');
+
+    main_div.appendChild(text_node);
+
+    document.body.appendChild(main_div);
+    main_div.addEventListener('click', function(){
+      main_div.remove();
+    });
+
+
+}

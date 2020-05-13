@@ -13,6 +13,7 @@ export class Messenger_controller {
   public rooms_update: Event_Emitter<void>; 
   public chatter_join_request: Event_Emitter<Room_join_req>;
   public chatters_update: Event_Emitter<string>;
+  public join_request_responded: Event_Emitter<Room_join_req_response>;
   public rooms: Map<string,Room_as_admin>;
   private room_join_requests_pending: Set<string>;
   private room_invitations: Array<Room_invitation>;
@@ -36,6 +37,7 @@ export class Messenger_controller {
     this.socket.on('joined_room', this._on_joined_room.bind(this));
     this.socket.on('chatter_joined_room', this._on_chatter_joined_room.bind(this));
     this.socket.on('chatter_join_request', this._on_chatter_join_request.bind(this));
+    this.socket.on('join_request_responded', this._on_join_request_response.bind(this));
     this.socket.on('chatter_left', this._on_chatter_left.bind(this));
     this.socket.on('left_room', this._on_left_room.bind(this));
     this.chatter_join_request = new Event_Emitter();
@@ -43,6 +45,7 @@ export class Messenger_controller {
     this.invited_to_room = new Event_Emitter();
     this.room_created = new Event_Emitter();
     this.invite_responded = new Event_Emitter();
+    this.join_request_responded = new Event_Emitter();
     this.chatters_update = new Event_Emitter();
     this.rooms_update = new Event_Emitter();
 
@@ -105,9 +108,12 @@ export class Messenger_controller {
     this.chatters_update.emit(room.uuid);
   }
   private _on_left_room (room_uuid: string): void {
-    console.log(room_uuid);
     this.rooms.delete(room_uuid);
     this.rooms_update.emit();
+  }
+  private _on_join_request_response (resp: Room_join_req_response): void {
+    this.room_join_requests_pending.delete(resp.room_uuid);
+    this.join_request_responded.emit(resp);
   }
   private announce_key(chatter_uuid: string, room_uuid: string): void {
     const room = this.rooms.get(room_uuid);
@@ -168,6 +174,7 @@ export class Messenger_controller {
   }
   public req_join_room (room_uuid: string): void {
     if (this.rooms.has(room_uuid)) return void 0;
+
     if (this.room_join_requests_pending.has(room_uuid)) return void 0;
     this.room_join_requests_pending.add(room_uuid);
     this.socket.emit('join_room_req', room_uuid);
