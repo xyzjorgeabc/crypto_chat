@@ -4,7 +4,7 @@
   "description": "encrypted anonymous chat",
   "main": "index.js",
   "scripts": {
-    "compile": "tsc && cd public webpack",
+    "compile": "tsc && cd public && webpack",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "Jorge Zavaleta",
