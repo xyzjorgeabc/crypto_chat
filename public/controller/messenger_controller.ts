@@ -129,6 +129,11 @@ export class Messenger_controller {
     });
 
   }
+  public eject_chatter (room_uuid: string, chatter_uuid: string) {
+    const room = this.rooms.get(room_uuid);
+    if (room === undefined || !room.chatters.has(chatter_uuid)) return void 0;
+    this.socket.emit('eject_chatter', {room_uuid: room_uuid, chatter_uuid: chatter_uuid} as room_chatter_uuids);
+  }
   public send_message (room_uuid: string, msg:string): void {
     
     const room = this.rooms.get(room_uuid);
@@ -321,3 +326,4 @@ export interface Join_notification {
 }
 
 type Leave_notification = Join_notification;
+type room_chatter_uuids = Join_notification;

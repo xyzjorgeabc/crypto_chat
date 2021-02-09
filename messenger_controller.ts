@@ -17,6 +17,12 @@ export class Messenger_controller {
     chatter.connection.emit('registered', chatter.uuid);
     return chatter.uuid;
   }
+  public eject_chatter (chatter_uuid: string, room_uuid: string) {
+    const room = this.rooms.get(room_uuid);
+    if (room === undefined || room.room_creator.uuid !== chatter_uuid) return void 0;
+
+    room.delete_chatter(chatter_uuid);
+  }
   public join_room_req (chatter_uuid: string, room_uuid: string) {
 
     const room = this.rooms.get(room_uuid);
@@ -150,7 +156,7 @@ class Room {
   public delete_chatter (chatter_uuid: string): void {
     const chatter = this.chatters.get(chatter_uuid);
     if (chatter === undefined) return void 0;
-    if (!this.chatters.has(chatter.uuid)) return void 0;
+
     this.chatters.delete(chatter.uuid);
     this.chatters.forEach((chatter: Chatter) => { 
       chatter.connection.emit('chatter_left', {chatter_uuid: chatter_uuid, room_uuid: this.uuid} as Leave_notification);
@@ -283,3 +289,4 @@ interface Join_notification {
 }
 
 type Leave_notification = Join_notification;
+export type room_chatter_uuids = Join_notification;

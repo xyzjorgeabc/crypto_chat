@@ -2,7 +2,12 @@ import express from 'express';
 import socketio from 'socket.io';
 import fs from 'fs';
 import https from 'https';
-import { Messenger_controller, Key_announcement, Message_distributable, Room_join_req_response} from './messenger_controller';
+import { Messenger_controller, 
+  Key_announcement, 
+  Message_distributable, 
+  Room_join_req_response,
+  room_chatter_uuids
+} from './messenger_controller';
 
 
 const app = express();
@@ -39,6 +44,9 @@ socket.on('connection', function(conn: socketio.Socket){
   });
   conn.on('key_announcement', function(annment: Key_announcement){
     messenger.announce_key(chatter_uuid, annment)
+  });
+  conn.on('eject_chatter', function(data: room_chatter_uuids){
+    messenger.eject_chatter(data.chatter_uuid, data.room_uuid);
   });
   conn.on('message', function (data: Message_distributable) {
     messenger.message(chatter_uuid, data);

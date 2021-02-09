@@ -326,10 +326,10 @@ export class View_controller {
     while (last_chatter_El = chatters_list.lastElementChild){
       chatters_list.removeChild(last_chatter_El);
     }
-    chatters_list.appendChild(create_chatter_li(this.messenger.uuid, true, is_admin));
+    chatters_list.appendChild(this.create_chatter_li(this.messenger.uuid, true, is_admin));
 
     for (const chatter_uuid of active_room.chatters.values()) {
-      chatters_list.appendChild(create_chatter_li(chatter_uuid, false, is_admin));
+      chatters_list.appendChild(this.create_chatter_li(chatter_uuid, false, is_admin));
     }
 
     this.update_chat(this.active_room);
@@ -350,10 +350,10 @@ export class View_controller {
       chatters_list.removeChild(last_li);
     }
     
-    chatters_list.appendChild(create_chatter_li(this.messenger.uuid, true, is_admin));
+    chatters_list.appendChild(this.create_chatter_li(this.messenger.uuid, true, is_admin));
 
     for ( const chatter of room.chatters.values()) {
-      chatters_list.appendChild(create_chatter_li(chatter, false, is_admin));
+      chatters_list.appendChild(this.create_chatter_li(chatter, false, is_admin));
     }
 
   }
@@ -406,7 +406,35 @@ export class View_controller {
       if (form_msgs[i][0].chatter_uuid === this.messenger.uuid) add_message_out(form_msgs[i]);
       else add_message_in(form_msgs[i]);
     }
+  }
+  private create_chatter_li (chatter_uuid:  string,  self: boolean, is_admin: boolean): HTMLLIElement {
 
+    const chatter_li = document.createElement('LI') as HTMLLIElement;
+    chatter_li.setAttribute('data-uuid', chatter_uuid);
+    const a = document.createElement('A');
+    a.className = 'chatter';
+    const uuid_node = document.createTextNode(self ? chatter_uuid + " (You)" : chatter_uuid );
+  
+    //delete icon 
+    if (!self && is_admin) {
+      var del_a = document.createElement('A') as HTMLAnchorElement;
+      del_a.className = 'delete-chatter';
+      var del_i = document.createElement('I') as HTMLElement;
+      del_i.className = 'far fa-trash-alt';
+      del_a.appendChild(del_i);
+      del_a.setAttribute('data-uuid', chatter_uuid);
+      del_a.addEventListener('click', (event) => {
+        console.log((event.currentTarget as HTMLAnchorElement).getAttribute('data-uuid'));
+        const chatter_to_eject = (event.currentTarget as HTMLAnchorElement).getAttribute('data-uuid');
+        this.messenger.eject_chatter(this.active_room, chatter_to_eject);
+      });
+  
+    }
+    a.appendChild(uuid_node)
+    chatter_li.appendChild(a);
+    if (!self && is_admin) chatter_li.appendChild(del_a);
+  
+    return chatter_li;
   }
 }
 
@@ -463,29 +491,6 @@ export function add_message_out(message_group: Message[]): void {
   chat_div.appendChild(message_div);
 }
 
-function create_chatter_li (chatter_uuid:  string,  self: boolean, is_admin: boolean): HTMLLIElement {
-
-  const chatter_li = document.createElement('LI') as HTMLLIElement;
-  chatter_li.setAttribute('data-uuid', chatter_uuid);
-  const a = document.createElement('A');
-  a.className = 'chatter';
-  const uuid_node = document.createTextNode(self ? chatter_uuid + " (You)" : chatter_uuid );
-
-  //delete icon 
-  if (!self && is_admin) {
-    var del_a = document.createElement('A') as HTMLAnchorElement;
-    del_a.className = 'delete-chatter';
-    var del_i = document.createElement('I') as HTMLElement;
-    del_i.className = 'far fa-trash-alt';
-    del_a.appendChild(del_i);
-  }
-  a.appendChild(uuid_node)
-  chatter_li.appendChild(a);
-  if (!self && is_admin) chatter_li.appendChild(del_a);
-
-  return chatter_li;
-}
-
 function format_messages (msgs: Message[], offset: number, max_groups: number): Message[][]{
   
   const messages = msgs.slice(offset);
@@ -509,7 +514,6 @@ function format_messages (msgs: Message[], offset: number, max_groups: number): 
 
 function display_info_card (text: string): void {
 
-  
     const main_div = document.createElement('DIV') as HTMLElement;
     const text_node = document.createTextNode(text);
 
@@ -522,6 +526,4 @@ function display_info_card (text: string): void {
     main_div.addEventListener('click', function(){
       main_div.remove();
     });
-
-
 }
