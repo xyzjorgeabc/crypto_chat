@@ -20,7 +20,7 @@ export class Messenger_controller {
   private socket: SocketIOClient.Socket;
  
   constructor (cb: (chatter_uuid: string) => void) {
-    this.socket = socketio.connect('192.168.31.173.:8443');
+    this.socket = socketio.connect('localhost:8443');
 
     this.rooms = new Map();
     this.room_invitations = [];
