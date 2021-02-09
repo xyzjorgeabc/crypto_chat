@@ -9,10 +9,14 @@ main {
   max-width: 1250px;
   max-height: 750px;
   min-height: 400px;
-  min-width: 950px;
+  min-width: 450px;
 }
 .hide {
   display: none!important;
+}
+#create_room,
+#join_room {
+  width: 100%;
 }
 #invite-wrap input {
   text-align: center;
@@ -156,7 +160,7 @@ main {
   min-width: 70px;
 }
 #send-icon {
-  height: 100%;
+  width: 100%;
 }
 
 .mod {
@@ -203,4 +207,11 @@ div > #rooms-nav {
   display: flex;
   justify-content: space-between;
 
+}
+
+@media screen and (min-width: 900px) {
+
+  main {
+    min-width: 900px;
+  }
 }

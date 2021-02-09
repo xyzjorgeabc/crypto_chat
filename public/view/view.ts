@@ -36,6 +36,16 @@ export class View_controller {
     
     const add_room_button = document.getElementById('add-room');
     add_room_button.addEventListener('click', this.display_join_room.bind(this));
+    
+    const out_text = document.getElementById('out-text');
+    out_text.addEventListener('keypress', (event) => {
+      if(event.code === "Enter" && !event.shiftKey) {
+        event.preventDefault();
+        console.log((document.getElementById('out-text') as HTMLTextAreaElement).value);
+        this.send_message();
+      }
+    });
+  
   }
   private _set_messenger_listeners (): void {
     this.messenger.invited_to_room.add_listener(this.display_invited_to_room.bind(this));
@@ -77,8 +87,11 @@ export class View_controller {
   }
   private send_message (): void {
     const txt_area = document.getElementById('out-text') as HTMLTextAreaElement;
+    console.log(txt_area.value.trim());
+    const message = txt_area.value.trim(); 
+    if (message === '') return void 0;
 
-    this.messenger.send_message(this.active_room, txt_area.value.trim());
+    this.messenger.send_message(this.active_room, message);
     txt_area.value = '';
   }
   private join_room (): void {
