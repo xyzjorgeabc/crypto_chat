@@ -4,16 +4,17 @@ import {
   Room_invitation, 
   Room_invitation_response,
   Room_join_req,
-  Message,
   Room_join_req_response
 } from '../controller/messenger_controller';
+import {Chat} from './chat';
 
 export class View_controller {
-
   public messenger: Messenger_controller;
   private active_room: string;
+  private chat_view: Chat;
   constructor () {
     this.active_room = null;
+    this.chat_view = null;
     this.messenger = new Messenger_controller(function(uuid: string){
       const session_id: HTMLInputElement = document.getElementById('session_id') as HTMLInputElement;
       session_id.value = uuid;
@@ -41,7 +42,6 @@ export class View_controller {
     out_text.addEventListener('keypress', (event) => {
       if(event.code === "Enter" && !event.shiftKey) {
         event.preventDefault();
-        console.log((document.getElementById('out-text') as HTMLTextAreaElement).value);
         this.send_message();
       }
     });
@@ -87,7 +87,6 @@ export class View_controller {
   }
   private send_message (): void {
     const txt_area = document.getElementById('out-text') as HTMLTextAreaElement;
-    console.log(txt_area.value.trim());
     const message = txt_area.value.trim(); 
     if (message === '') return void 0;
 
@@ -303,6 +302,17 @@ export class View_controller {
     document.body.appendChild(card_div);
     center_absolute(card_div);
   }
+  private _switch_chat (): void {
+    if (this.chat_view) this.chat_view.delete();
+    this.chat_view = new Chat();
+    const room = this.messenger.rooms.get(this.active_room);
+    for (let i = 0; i < room.chat.length; i++) {
+      if (room.chat[i].chatter_uuid === this.messenger.uuid)
+        this.chat_view.add_message_out(room.chat[i]);
+      else
+        this.chat_view.add_message_in(room.chat[i]);
+    }
+  }
   private update_active_room (): void {
     if (this.messenger.rooms.size === 0) return void 0;
     if ( document.getElementById('rooms-wrap').classList.contains('hide') ) this._switch_to_chat();
@@ -331,8 +341,7 @@ export class View_controller {
     for (const chatter_uuid of active_room.chatters.values()) {
       chatters_list.appendChild(this.create_chatter_li(chatter_uuid, false, is_admin));
     }
-
-    this.update_chat(this.active_room);
+    this._switch_chat();
   }
   private update_room_chatters (room_uuid: string): void {
     
@@ -393,19 +402,14 @@ export class View_controller {
     this.update_active_room();
   }
   private update_chat(room_uuid: string): void {
-    const room = this.messenger.rooms.get(this.active_room);
     if (room_uuid !== this.active_room) return void 0;
-    empty_el(document.getElementById('chat') as HTMLDivElement);
-    if (!room.chat.length) {
-      return void 0;
-    }
+    const room = this.messenger.rooms.get(this.active_room);
+    if (!room.chat.length) return void 0;
 
-    const form_msgs = format_messages(room.chat, 0,10);
-
-    for ( let i = 0; i < form_msgs.length; i++ ) {
-      if (form_msgs[i][0].chatter_uuid === this.messenger.uuid) add_message_out(form_msgs[i]);
-      else add_message_in(form_msgs[i]);
-    }
+    if (room.chat[room.chat.length-1].chatter_uuid === this.messenger.uuid)
+      this.chat_view.add_message_out(room.chat[room.chat.length-1]);
+    else
+      this.chat_view.add_message_in(room.chat[room.chat.length-1]);
   }
   private create_chatter_li (chatter_uuid:  string,  self: boolean, is_admin: boolean): HTMLLIElement {
 
@@ -424,7 +428,6 @@ export class View_controller {
       del_a.appendChild(del_i);
       del_a.setAttribute('data-uuid', chatter_uuid);
       del_a.addEventListener('click', (event) => {
-        console.log((event.currentTarget as HTMLAnchorElement).getAttribute('data-uuid'));
         const chatter_to_eject = (event.currentTarget as HTMLAnchorElement).getAttribute('data-uuid');
         this.messenger.eject_chatter(this.active_room, chatter_to_eject);
       });
@@ -444,72 +447,6 @@ export function resize_text_area() {
   out_text.style.height = 'auto';
   out_text.style.height = parseInt(window.getComputedStyle(out_text).height as string) - 16 + 2 + 'px';
   out_text.style.height = out_text.scrollHeight+'px';
-}
-
-export function add_message_in(message_group: Message[]) {
-  const chat_div: HTMLElement = document.getElementById('chat') as HTMLElement;
-  const message_div: HTMLElement = document.createElement('DIV') as HTMLElement;
-  const uuid_div: HTMLElement = document.createElement('DIV') as HTMLElement;
-  uuid_div.appendChild(document.createTextNode(message_group[0].chatter_uuid));
-  const message_text_div: HTMLElement = document.createElement('DIV') as HTMLElement;
-
-  for (let i = 0; i < message_group.length; i++) {
-    const message_p = document.createElement('P');
-    message_p.appendChild(document.createTextNode(message_group[i].message));
-    message_text_div.appendChild(message_p);
-  }
-
-  message_div.className = 'message-in message';
-  uuid_div.className = 'uuid-in';
-  message_text_div.className = 'message-text message-body';
-
-  message_div.appendChild(uuid_div);
-  message_div.appendChild(message_text_div);
-  chat_div.appendChild(message_div);
-
-}
-
-export function add_message_out(message_group: Message[]): void {
-  const chat_div: HTMLElement = document.getElementById('chat') as HTMLElement;
-  const message_div: HTMLElement = document.createElement('DIV') as HTMLElement;
-  const you_div: HTMLElement = document.createElement('DIV') as HTMLElement;
-  you_div.appendChild(document.createTextNode('You'));
-  const message_text_div: HTMLElement = document.createElement('DIV') as HTMLElement;
-
-  for (let i = 0; i < message_group.length; i++) {
-    const message_p = document.createElement('P');
-    message_p.appendChild(document.createTextNode(message_group[i].message));
-    message_text_div.appendChild(message_p);
-  }
-
-  message_div.className = 'message-out message';
-  you_div.className = 'uuid-out';
-  message_text_div.className = 'message-text message-body';
-  
-  message_div.appendChild(you_div);
-  message_div.appendChild(message_text_div);
-  chat_div.appendChild(message_div);
-}
-
-function format_messages (msgs: Message[], offset: number, max_groups: number): Message[][]{
-  
-  const messages = msgs.slice(offset);
-  const formatted_msgs: Message[][] = [];
-  let curr_mesg_group: Message[] = [];
-  curr_mesg_group.push(messages[0]);
-  for (let i = 1; i < messages.length; i++) {
-  
-    const msg = messages[i];
-    
-    if (msg.chatter_uuid !== messages[i-1].chatter_uuid) {
-      formatted_msgs.push(curr_mesg_group);
-      curr_mesg_group = [];
-      curr_mesg_group.push(msg);
-    }
-    else curr_mesg_group.push(msg);
-  }
-  formatted_msgs.push(curr_mesg_group);
-  return formatted_msgs;
 }
 
 function display_info_card (text: string): void {

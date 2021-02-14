@@ -80,7 +80,7 @@ main {
   width: 100%;
   border-left: 1px solid #204051;
 }
-#chat {
+#chat_scroll {
   height: 400px;
   flex-grow: 1;
   padding: 1em;
@@ -91,13 +91,13 @@ main {
 .message-in {
   display: flex;
   flex-direction: column;
-  flex-wrap: nowrap;
+  align-items: flex-start;
   font-size: 16px;
 }
 .message-out {
   display: flex;
-  justify-content: flex-end;
-  flex-wrap: wrap;
+  flex-direction: column;
+  align-items: flex-end;
   font-size: 16px;
 }
 .uuid-in {
@@ -117,12 +117,28 @@ main {
 .message-text {
   max-width: 80%;
   flex-grow: 1;
+  margin-bottom: 5px;
+}
+.message-text.last {
+  animation-name: pop;
+  animation-duration: 1s;
+}
+@keyframes pop {
+  0% {transform: scale(0.8,0.8);}
+  50% {transform: scale(1,1);}
+  100% {transform: scale(1,1);}
+}
+.message-text p {
+  word-break: break-all;
+  white-space: pre-line;
 }
 .message-out .message-text {
   background-color: whitesmoke;
+  text-align: right;
 }
 .message-in .message-text {
-  background-color: burlywood
+  background-color: burlywood;
+  text-align: left;
 }
 .message {
   background-color: transparent;
@@ -208,6 +224,7 @@ div > #rooms-nav {
   justify-content: space-between;
 
 }
+
 
 @media screen and (min-width: 900px) {
 
