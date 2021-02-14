@@ -46,7 +46,7 @@ socket.on('connection', function(conn: socketio.Socket){
     messenger.announce_key(chatter_uuid, annment)
   });
   conn.on('eject_chatter', function(data: room_chatter_uuids){
-    messenger.eject_chatter(data.chatter_uuid, data.room_uuid);
+    messenger.eject_chatter(chatter_uuid, data.chatter_uuid, data.room_uuid);
   });
   conn.on('message', function (data: Message_distributable) {
     messenger.message(chatter_uuid, data);

@@ -17,11 +17,11 @@ export class Messenger_controller {
     chatter.connection.emit('registered', chatter.uuid);
     return chatter.uuid;
   }
-  public eject_chatter (chatter_uuid: string, room_uuid: string) {
+  public eject_chatter (chatter_uuid: string, chatter_to_eject_uuid: string, room_uuid: string) {
     const room = this.rooms.get(room_uuid);
     if (room === undefined || room.room_creator.uuid !== chatter_uuid) return void 0;
 
-    room.delete_chatter(chatter_uuid);
+    room.delete_chatter(chatter_to_eject_uuid);
   }
   public join_room_req (chatter_uuid: string, room_uuid: string) {
 
