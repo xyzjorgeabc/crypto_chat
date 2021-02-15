@@ -205,12 +205,12 @@ class Unwraped_msg {
 export class Message {
 
   public message: string;
-  public hash: string;
+  public id: string;
   public chatter_uuid: string;
   public time: number;
   constructor (message: string, chatter_uuid: string, time: number) {
     this.message = message;
-    this.hash = md5(message);
+    this.id = window.crypto.getRandomValues(new Uint8Array(20)).join('');
     this.chatter_uuid = chatter_uuid;
     this.time = time;
   }

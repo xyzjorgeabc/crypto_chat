@@ -304,14 +304,9 @@ export class View_controller {
   }
   private _switch_chat (): void {
     if (this.chat_view) this.chat_view.delete();
-    this.chat_view = new Chat();
+
     const room = this.messenger.rooms.get(this.active_room);
-    for (let i = 0; i < room.chat.length; i++) {
-      if (room.chat[i].chatter_uuid === this.messenger.uuid)
-        this.chat_view.add_message_out(room.chat[i]);
-      else
-        this.chat_view.add_message_in(room.chat[i]);
-    }
+    this.chat_view = new Chat(this.messenger.uuid, room.chat);
   }
   private update_active_room (): void {
     if (this.messenger.rooms.size === 0) return void 0;
