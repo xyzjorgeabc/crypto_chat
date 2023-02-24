@@ -78,7 +78,7 @@ main {
   flex-direction: column;
   height: 100%;
   width: 100%;
-  border-left: 1px solid #204051;
+  border-left: 1px solid #dbdbdb;
 }
 #chat_scroll {
   height: 400px;
@@ -168,7 +168,8 @@ main {
   min-height: unset;
   max-height: 6em;
 }
-#send-button {
+#send-button,
+#up-file {
   margin-left: 3px;
   border-radius: 0;
   min-height: calc(3em + 2px);

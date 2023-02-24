@@ -6,7 +6,7 @@ import {
   Room_join_req,
   Room_join_req_response
 } from '../controller/messenger_controller';
-import {Chat} from './chat';
+import { Chat } from './chat';
 
 export class View_controller {
   public messenger: Messenger_controller;
@@ -38,6 +38,14 @@ export class View_controller {
     const add_room_button = document.getElementById('add-room');
     add_room_button.addEventListener('click', this.display_join_room.bind(this));
     
+    const up_file =  document.getElementById('up-file');    
+    up_file.addEventListener('click', (event)=>{
+      (document.getElementById('up-file-inp') as HTMLInputElement).click();
+    });
+
+    const up_file_inp = document.getElementById('up-file-inp') as HTMLInputElement;
+    up_file_inp.addEventListener('input', this.send_file.bind(this));
+
     const out_text = document.getElementById('out-text');
     out_text.addEventListener('keypress', (event) => {
       if(event.code === "Enter" && !event.shiftKey) {
@@ -84,6 +92,18 @@ export class View_controller {
   private _on_room_created (): void {
     if (!document.getElementById('invite-wrap').classList.contains('hide')) this._switch_to_chat();
     else this.update_rooms_nav();
+  }
+  private send_file(event: InputEvent): void {
+    const html_file = (event.target as HTMLInputElement).files[0];
+    //max file size 5MB
+    if (html_file.size > 5000000) return void 0;
+    
+    this.messenger.announce_file(this.active_room, html_file);
+
+    /*const buffer_prom = html_file.arrayBuffer();
+    buffer_prom.then((file: ArrayBuffer)=>{
+      this.messenger.announce_file(this.active_room ,html_file.name, file);
+    });*/
   }
   private send_message (): void {
     const txt_area = document.getElementById('out-text') as HTMLTextAreaElement;

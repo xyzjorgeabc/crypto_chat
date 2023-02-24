@@ -6,7 +6,8 @@ import { Messenger_controller,
   Key_announcement, 
   Message_distributable, 
   Room_join_req_response,
-  room_chatter_uuids
+  room_chatter_uuids,
+  File_announcement
 } from './messenger_controller';
 
 
@@ -50,6 +51,12 @@ socket.on('connection', function(conn: socketio.Socket){
   });
   conn.on('message', function (data: Message_distributable) {
     messenger.message(chatter_uuid, data);
+  });
+  conn.on('file_announcement', function (file_ann: File_announcement) {
+    messenger.file_announcement(chatter_uuid, file_ann);
+  });
+  conn.on('download_file', function (file_ann) {
+    messenger.file_download(chatter_uuid, file_ann);
   });
 });
 

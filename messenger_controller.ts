@@ -80,6 +80,17 @@ export class Messenger_controller {
     room.send_message(data, chatter_uuid);
     
   }
+  public file_announcement ( chatter_uuid: string, file_ann: File_announcement): void {
+    const room = this.rooms.get(file_ann.room_uuid);
+    if (room === undefined || chatter_uuid !== file_ann.chatter_uuid) return void 0; 
+
+    room.announce_file(file_ann);
+  }
+  public file_download (chatter_uuid: string, file_ann: File_announcement): void {
+    const room = this.rooms.get(file_ann.room_uuid);
+    if (room === undefined) return void 0;
+    
+  }
   public join_room_req_response (resp: Room_join_req_response): void {
 
     const room = this.rooms.get(resp.room_uuid);
@@ -101,6 +112,7 @@ export class Messenger_controller {
 class Room {
 
   public chatters: Map<string,Chatter>;
+  public file_announcements: File_announcement[];
   public room_creator: Chatter;
   public uuid: string;
   public join_requests: Set<string>; //uuid
@@ -108,6 +120,7 @@ class Room {
   constructor (room_creator: Chatter) {
     this.uuid = crypto.randomBytes(4).toString('hex');
     this.chatters = new Map();
+    this.file_announcements = [];
     this.chatters.set(room_creator.uuid, room_creator);
     this.room_creator = room_creator;
     this.join_requests = new Set();
@@ -179,6 +192,15 @@ class Room {
       });
 
     }
+  }
+  public announce_file(file_ann: File_announcement): void {
+    this.file_announcements.push(file_ann);
+
+    this.chatters.forEach((chatter: Chatter)=>{
+      if (chatter.uuid === file_ann.chatter_uuid) return void 0;
+
+      chatter.connection.emit('file_announcement', file_ann);
+    });
   }
   public request_join (chatter_uuid: string): void {
     
@@ -286,6 +308,13 @@ interface Room_distributable {
 interface Join_notification {
   chatter_uuid: string;
   room_uuid: string;
+}
+
+export interface File_announcement {
+  chatter_uuid: string;
+  room_uuid: string;
+  file_name: string;
+  size_bytes: number; 
 }
 
 type Leave_notification = Join_notification;

@@ -1,7 +1,6 @@
 import * as socketio from 'socket.io-client';
 import { Event_Emitter } from '../utils/utils';
 import { Crypto_controller } from './crypto_controller';
-import * as md5 from 'md5';
 
 export class Messenger_controller {
 
@@ -14,6 +13,7 @@ export class Messenger_controller {
   public chatter_join_request: Event_Emitter<Room_join_req>;
   public chatters_update: Event_Emitter<string>;
   public join_request_responded: Event_Emitter<Room_join_req_response>;
+  public file_announcement: Event_Emitter<File_announcement>;
   public rooms: Map<string,Room_as_admin>;
   private room_join_requests_pending: Set<string>;
   private room_invitations: Array<Room_invitation>;
@@ -40,6 +40,7 @@ export class Messenger_controller {
     this.socket.on('join_request_responded', this._on_join_request_response.bind(this));
     this.socket.on('chatter_left', this._on_chatter_left.bind(this));
     this.socket.on('left_room', this._on_left_room.bind(this));
+    this.socket.on('file_announcement', this._on_file_announcement.bind(this));
     this.chatter_join_request = new Event_Emitter();
     this.chat_update = new Event_Emitter();
     this.invited_to_room = new Event_Emitter();
@@ -48,6 +49,7 @@ export class Messenger_controller {
     this.join_request_responded = new Event_Emitter();
     this.chatters_update = new Event_Emitter();
     this.rooms_update = new Event_Emitter();
+    this.file_announcement = new Event_Emitter();
 
     this.register();
   }
@@ -115,6 +117,12 @@ export class Messenger_controller {
     this.room_join_requests_pending.delete(resp.room_uuid);
     this.join_request_responded.emit(resp);
   }
+  private _on_file_announcement (file_ann: File_announcement): void {
+    console.log(file_ann);
+    const room = this.rooms.get(file_ann.room_uuid);
+    room.file_announcements.push(file_ann);
+    this.file_announcement.emit(file_ann);
+  }
   private announce_key(chatter_uuid: string, room_uuid: string): void {
     const room = this.rooms.get(room_uuid);
     const local_pbk_prom = room.crypto.get_local_pbk(chatter_uuid);
@@ -129,7 +137,7 @@ export class Messenger_controller {
     });
 
   }
-  public eject_chatter (room_uuid: string, chatter_uuid: string) {
+  public eject_chatter (room_uuid: string, chatter_uuid: string): void {
     const room = this.rooms.get(room_uuid);
     if (room === undefined || !room.chatters.has(chatter_uuid)) return void 0;
     this.socket.emit('eject_chatter', {room_uuid: room_uuid, chatter_uuid: chatter_uuid} as room_chatter_uuids);
@@ -144,6 +152,21 @@ export class Messenger_controller {
     room.encrypt_message(msg).then((dist_msgs: Message_distrutable[]) => {
       this.socket.emit('message', {room_uuid: room_uuid, message: dist_msgs});
     });
+  }
+  public announce_file ( room_uuid: string, file: File): void {
+    const room = this.rooms.get(room_uuid);
+    if (room === undefined) return void 0;
+
+    const file_ann: File_announcement = {
+      file_name: file.name,
+      chatter_uuid: this.uuid,
+      room_uuid: room_uuid,
+      size_bytes: file.size
+    };
+
+    room.file_announcements.push(file_ann);
+    room.files.push(file);
+    this.socket.emit('file_announcement', file_ann);
   }
   public respond_room_invitation (room_uuid: string, join: boolean) {
     this.socket.emit('invite_response', {room_uuid: room_uuid, chatter_uuid: this.uuid , join: join} as Room_invitation_response);
@@ -218,6 +241,8 @@ export class Message {
 
 export class Room {
   public chat: Message[];
+  public file_announcements: File_announcement[];
+  public files: File[];
   public chatters: Set<string>;
   public room_creator_uuid: string;
   public uuid: string;
@@ -226,6 +251,8 @@ export class Room {
     this.uuid = room_uuid;
     this.chatters = new Set();
     this.chat = [];
+    this.files = [];
+    this.file_announcements = [];
     this.room_creator_uuid = room_creator_uuid;
     this.crypto = new Crypto_controller();
   }
@@ -307,6 +334,13 @@ interface Room_distributable {
   uuid: string;
   creator_uuid: string;
   chatters: string[];
+}
+
+interface File_announcement {
+  chatter_uuid: string;
+  room_uuid: string;
+  file_name: string;
+  size_bytes: number; 
 }
 
 export interface Room_join_req {
